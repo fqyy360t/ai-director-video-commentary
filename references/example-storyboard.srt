@@ -1,0 +1,31 @@
+1
+00:00:00,000 --> 00:00:02,000
+The man never imagined
+
+2
+00:00:02,000 --> 00:00:04,000
+the safest room in the
+
+3
+00:00:04,000 --> 00:00:06,000
+bank was actually the
+
+4
+00:00:06,000 --> 00:00:08,000
+trap.
+
+5
+00:00:08,000 --> 00:00:09,000
+Only then did he realize
+
+6
+00:00:09,000 --> 00:00:10,000
+the robbery had started
+
+7
+00:00:10,000 --> 00:00:11,000
+before he entered the
+
+8
+00:00:11,000 --> 00:00:12,000
+building.

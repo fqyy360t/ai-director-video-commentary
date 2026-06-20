@@ -1,0 +1,59 @@
+{
+  "task": {
+    "input_video": "source.mp4",
+    "target_duration": 12,
+    "narration_pov": "third_person",
+    "content_type": "movie",
+    "genre": "high_iq_crime"
+  },
+  "timeline": [
+    {
+      "clip_id": "clip_001",
+      "sentence_id": "sent_001",
+      "sentence": "The man never imagined the safest room in the bank was actually the trap.",
+      "source": {
+        "scene_ids": ["scene_0042"],
+        "start": 4810.0,
+        "end": 4818.0
+      },
+      "output": {
+        "start": 0.0,
+        "end": 8.0
+      },
+      "visual_summary": "The protagonist steps into the vault and the door locks behind him.",
+      "match_reason": "The narration describes a trap, and the selected scene visually shows the vault door locking.",
+      "match_score": 0.91,
+      "edit": {
+        "crop": "9:16_center",
+        "speed": 1.0,
+        "original_audio": "duck",
+        "transition": "cut"
+      },
+      "review_flags": []
+    },
+    {
+      "clip_id": "clip_002",
+      "sentence_id": "sent_002",
+      "sentence": "Only then did he realize the robbery had started before he entered the building.",
+      "source": {
+        "scene_ids": ["scene_0011"],
+        "start": 1320.0,
+        "end": 1324.0
+      },
+      "output": {
+        "start": 8.0,
+        "end": 12.0
+      },
+      "visual_summary": "A flashback shows the guard secretly switching the keycard.",
+      "match_reason": "The flashback explains how the trap was prepared before the vault scene.",
+      "match_score": 0.88,
+      "edit": {
+        "crop": "9:16_center",
+        "speed": 1.0,
+        "original_audio": "duck",
+        "transition": "cut"
+      },
+      "review_flags": []
+    }
+  ]
+}
