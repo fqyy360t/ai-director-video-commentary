@@ -1,0 +1,8 @@
+faster-whisper>=1.2.1
+scenedetect>=0.7
+opencv-python>=4.13.0
+openai>=2.31.0
+pydantic>=2.12.0
+python-dotenv>=1.2.0
+ffmpeg-python>=0.2.0
+srt>=3.5.3
