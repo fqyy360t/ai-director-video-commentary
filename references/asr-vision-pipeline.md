@@ -207,15 +207,31 @@ def calc_output_duration(sentence: str) -> float:
     return max(speech_dur + BUFFER_AFTER, MIN_DURATION)
 ```
 
+### Source Timestamp Shift（源时间戳前移）
+
+渲染前必须执行：每条 clip 的 `source.start` 按该条字幕的 TTS 朗读时长前移。
+
+**公式：** `new_source_start = max(0, source_start - char_count / CHARS_PER_SEC)`
+
+**原理：** 用户在剪映中生成 TTS 配音后，配音占据 clip 前 N 秒（N = 字数÷4）。TTS 播完后原声淡入。如果不前移，淡入时听到的是片段开头的内容，与字幕剧情不对应。前移后，TTS 结束时原声淡入的内容正好是字幕所描述的对话/画面。
+
+```python
+for item in timeline:
+    char_count = count_chinese_chars(item["sentence"])
+    tts_dur = char_count / CHARS_PER_SEC
+    src_duration = item["source"]["end"] - item["source"]["start"]
+    item["source"]["start"] = max(0.0, item["source"]["start"] - tts_dur)
+    item["source"]["end"] = item["source"]["start"] + src_duration
+```
+
 ### Algorithm
 
-1. For each clip in `storyboard.timeline`:
+1. **Shift source timestamps** by TTS duration: `source.start -= char_count / 4`
+2. For each clip in `storyboard.timeline`:
    a. Extract source range `[source.start, source.end]` from input video
-   b. Calculate `output_duration` from the subtitle text using `calc_output_duration(sentence)`
-   c. Calculate `source_duration = source.end - source.start`
-   d. Compute speed ratio: `speed = source_duration / output_duration`
-   e. Apply `setpts=(1/speed)*PTS` video filter and `atempo=speed` audio filter
-   f. Save to temp clip file
+   b. Trim to `output_duration`（使用 `-t output_duration`，不使用源视频完整时长）
+   c. Apply audio ducking: TTS 期间原声降至 0.15，结束前 1.5s 线性淡入到 1.0
+   d. Save to temp clip file
 
 2. Concat all temp clips (无缝拼接, no gaps) into `final_preview.mp4`
 

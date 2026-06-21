@@ -44,30 +44,63 @@ The core product principle is: do not cut clips first and force subtitles later.
    - If the user provides a title, actors, episode number, or any identifying info, search the web for the plot synopsis, character relationships, key turning points, and major twists of that specific content.
    - For a single episode, search for that episode's plot summary specifically.
    - Extract and save: main characters and their goals/motivations, central conflict, emotional arc, key reversals, foreshadowing, and ending.
-   - This research becomes the "Director's brief" — it feeds into Step 4 (Story Director) so that the narration is grounded in real plot knowledge rather than only inferred from visual frames.
+   - This research becomes the "Director's brief" — it feeds into Step 5 (Story Director) so that the narration is grounded in real plot knowledge rather than only inferred from visual frames.
    - Skip this step only if the user provides no identifying information about the video.
 
-3. Build the multimodal timeline:
+3. **开篇钩子选择（必须）：**
+
+   基于剧情调研结果，生成 **10 个开篇钩子**供用户选择。钩子是解说视频的前 1-2 句话，必须在 3 秒内抓住观众。
+
+   **核心原则：反差越大越好，越无厘头越爆。不要铺垫，上来就炸。**
+
+   **10 个钩子必须覆盖的 4 个方向：**
+   - 3 个**反差+爽点**：身份反转、被虐开局、全员打脸（"一个上门女婿，把整个家族掀翻了"）
+   - 3 个**无厘头+狗血**：荒诞前提、夸张情绪、标题党（"作者怒了：穿越！必须穿越！让这个废物逆天改命！"）
+   - 2 个**悬念+冲突**：信息差、致命一击（"所有人都以为他输了，但没人看到他嘴角的笑"）
+   - 1 个**提问型**：不可思议的问题（"赘婿？不好意思，你们全家加起来都不够他玩的"）
+   - 1 个**数据+情绪**：数字冲击 + 极端情绪（"被骂了一百次废物，第一千零一次他笑了"）
+
+   **❌ 禁止平淡开头**：不要"从前有个人""这个故事讲的是""今天给大家讲一个"
+   **❌ 禁止铺垫**：背景信息放到第二句以后，第一句只管炸
+
+   **展示格式：**
+   ```
+   === 开篇钩子（请选择 1 个）===
+   1. [悬念] "..."
+   2. [悬念] "..."
+   3. [冲突] "..."
+   ...
+   10. [数据] "..."
+
+   请选择编号，或告诉我你想用什么样的开头。
+   ```
+
+   **用户选定钩子后，该钩子决定整篇解说的情感基调和叙事方向，后续 Step 5-6 的故事板必须围绕这个钩子展开。**
+
+   如用户不满意 10 个选项，可要求重新生成（换风格/换角度/更夸张/更克制），直到满意为止。
+
+4. Build the multimodal timeline:
    
    - Use FFmpeg to extract audio, scenes, and representative frames.
    - Use ASR to create a Dialogue Timeline. Prefer faster-whisper with VAD for the MVP.
    - Use Qwen3-VL-Plus on scene keyframes or short frame sets to create visual summaries, characters, actions, emotions, locations, shot types, and tags.
    - Keep OCR optional. Enable it for foreign-language hard subtitles, phone/chat/news/document screens, crime/suspense/high-IQ crime, or when Qwen3-VL-Plus detects important on-screen text.
 
-4. Fuse timelines into a Video Semantic Graph:
+5. Fuse timelines into a Video Semantic Graph:
    
    - Do not treat subtitles as the main object.
    - Create scene/event nodes and relationship edges.
    - Preserve source-video timestamps for every node.
 
-5. Use Claude (built-in) as the story director:
+6. Use Claude (built-in) as the story director:
 
    - Analyze plot roles, emotional arcs, hooks, reversals, foreshadowing, key evidence, conflict, and character motivation.
    - If a Director's brief exists from Step 2, use it as the primary plot knowledge source. Cross-reference with the Video Semantic Graph to validate timestamps and identify the most visually impactful moments.
+   - **以用户选定的开篇钩子（Step 3）为基调**，整篇解说的情感风格、叙事节奏必须与钩子一致。
    - Select or synthesize a viral formula based on content type, genre, target duration, and point of view.
    - Generate narration. 每句解说词按自然语义断句，不要为凑字数强行拆句。一句话就是一个完整的表达，对应一条字幕。
 
-6. Generate the Storyboard:
+7. Generate the Storyboard:
 
    - Bind each narration sentence to one or more semantic scenes/events.
    - Store source timestamps, output timestamps, visual summary, match reason, edit instructions, and subtitle text.
@@ -78,21 +111,22 @@ The core product principle is: do not cut clips first and force subtitles later.
      2. 对每条 clip，查找 source 时间范围内重叠的 ASR 片段，检查对话内容是否与解说词描述的剧情一致
      3. 查找最近的 `vision_analysis.json` 条目（按 source 中位时间匹配），确认视觉分析中的画面描述与解说词匹配
      4. 标记所有不一致项：ASR 对话与解说剧情不符、vision 画面距离 > 15s、ASR 静音区被误用作对话场景
-     5. **任何一条 clip 未通过验证，必须修正其 source 时间戳后重新全量验证。不得在存在未修复的不一致项时进入 Step 8 渲染。**
+     5. **任何一条 clip 未通过验证，必须修正其 source 时间戳后重新全量验证。不得在存在未修复的不一致项时进入 Step 9 渲染。**
 
-7. **用户确认故事板（必须）：**
+8. **用户确认故事板（必须）：**
 
    - 生成故事板后，**必须先向用户展示解说内容概览**，等待用户确认后才能进入渲染环节。
    - 展示格式：按"幕"分组，每幕列出标题、字幕条数、时间范围、核心解说词摘要。
    - 同时展示总字幕条数、总时长、平均每条时长。
    - 用户可以：
-     - **确认通过** → 进入 Step 8 渲染
-     - **要求调整** → 指出哪些部分需要修改（太长/太短/剧情不准/节奏不对），回到 Step 5-6 重新生成故事板
-     - **推翻重来** → 回到 Step 4 甚至 Step 3 重新分析
+     - **确认通过** → 进入 Step 9 渲染
+     - **要求调整** → 指出哪些部分需要修改（太长/太短/剧情不准/节奏不对），回到 Step 6-7 重新生成故事板
+     - **推翻重来** → 回到 Step 5 甚至 Step 3 重新选择钩子
    - **不得跳过此步骤直接渲染。**
 
-8. Render the export package:
+9. Render the export package:
 
+   - **源时间戳前移**：渲染前，每条 clip 的 `source.start` 按 `字数 ÷ 4` 秒前移。公式：`new_source_start = max(0, source_start - char_count / 4)`。这样 TTS 配音播完后原声淡入时，听到的内容刚好对应当前字幕描述的剧情。`source.end` 保持与 `source.start` 的原始间距不变。
    - 先逐条渲染独立 clip 到临时目录，然后按顺序无缝拼接成一个完整的 `final_preview.mp4`。
    - 渲染完成后，**必须执行"校验规则"章节中的字幕-视频结束时间校验**。
    - SRT 时间轴必须与 `final_preview.mp4` 实际时长一致（误差 < 0.5s）。如校验失败，用 ffprobe 探测实际 clip 时长重建 SRT，直到校验通过。

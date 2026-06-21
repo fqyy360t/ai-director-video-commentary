@@ -73,7 +73,22 @@ Generate `narration_subtitle.srt` from `timeline[].sentence` and `timeline[].out
 输出时长：4.0 + 0.1 = 4.1s
 ```
 
-### Narration Quality Standards
+### 源时间戳前移规则
+
+**渲染前，每条 clip 的 `source.start` 必须按 TTS 朗读时长前移。**
+
+公式：`new_source_start = max(0, source_start - 字数 / 4)`
+
+示例：
+```
+字幕："苏檀儿被逼到绝境，当众立誓：终身不嫁。"（16字）
+原 source.start: 1483.0s
+TTS 时长: 16 ÷ 4 = 4.0s
+新 source.start: 1483.0 - 4.0 = 1479.0s
+source.end 间距不变: 1479.0 + 10.0 = 1489.0s
+```
+
+这样 TTS 配音播完后原声淡入时，听到的原声内容刚好对应当前字幕描述的剧情。
 
 ### Narration Quality Standards
 
